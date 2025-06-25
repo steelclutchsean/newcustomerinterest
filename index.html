@@ -134,7 +134,8 @@
         }
 
         input[type="text"]:focus,
-        input[type="email"]:focus {
+        input[type="email"]:focus,
+        select:focus {
             outline: none;
             border-color: #2c5530;
             background: white;
@@ -271,18 +272,26 @@
                 <!-- Hidden field to capture selected interests as comma-separated values -->
                 <input type="hidden" id="selectedInterests" name="00N000000000000" value="">
                 
+                <!-- Hidden field to capture preferred days as comma-separated values -->
+                <input type="hidden" id="selectedDays" name="00N000000000002" value="">
+                
                 <div class="form-group">
                     <div class="checkbox-group">
-                        <h3>What Trinity offerings interest you? (Select all that apply) *</h3>
+                        <h3>What Trinity offerings interest you beyond basic wiring that's included with your builder? (Select all that apply) *</h3>
                         
                         <div class="checkbox-item">
-                            <input type="checkbox" id="lowVoltage" name="interests" value="Low Voltage Structured Wiring">
-                            <label for="lowVoltage">Low Voltage Structured Wiring</label>
+                            <input type="checkbox" id="advancedTech" name="interests" value="Advanced Tech Structured Wiring">
+                            <label for="advancedTech">Advanced Tech Structured Wiring</label>
                         </div>
                         
                         <div class="checkbox-item">
-                            <input type="checkbox" id="security" name="interests" value="Security Monitoring">
-                            <label for="security">Security Monitoring</label>
+                            <input type="checkbox" id="networking" name="interests" value="Networking">
+                            <label for="networking">Networking (Wired, Fiber, WiFi)</label>
+                        </div>
+                        
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="securitySystem" name="interests" value="Security System and Monitoring">
+                            <label for="securitySystem">Security System and Monitoring</label>
                         </div>
                         
                         <div class="checkbox-item">
@@ -296,8 +305,8 @@
                         </div>
                         
                         <div class="checkbox-item">
-                            <input type="checkbox" id="accessControl" name="interests" value="Access Control">
-                            <label for="accessControl">Access Control</label>
+                            <input type="checkbox" id="centralVacuum" name="interests" value="Central Vacuum">
+                            <label for="centralVacuum">Central Vacuum</label>
                         </div>
                         
                         <div class="checkbox-item">
@@ -306,13 +315,8 @@
                         </div>
                         
                         <div class="checkbox-item">
-                            <input type="checkbox" id="wirelessAudio" name="interests" value="Wireless Audio">
-                            <label for="wirelessAudio">Wireless Audio</label>
-                        </div>
-                        
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="networking" name="interests" value="Networking">
-                            <label for="networking">Networking (Wired, Fiber, WiFi)</label>
+                            <input type="checkbox" id="wholeHouseAudio" name="interests" value="Whole House Audio">
+                            <label for="wholeHouseAudio">Whole House Audio</label>
                         </div>
                         
                         <div class="checkbox-item">
@@ -322,6 +326,56 @@
                     </div>
                     <div class="error-message" id="interestsError" style="display: none; color: #dc3545; font-size: 0.9em; margin-top: 8px;">
                         Please select at least one area of interest.
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="meetingType">Preferred Meeting Type (Optional)</label>
+                    <select id="meetingType" name="00N000000000001" style="width: 100%; padding: 12px 16px; border: 2px solid #e1e5e9; border-radius: 10px; font-size: 16px; background: #f8f9fa; transition: all 0.3s ease;">
+                        <option value="">Select your preference</option>
+                        <option value="In Person">In Person</option>
+                        <option value="Remote">Remote</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <div class="checkbox-group">
+                        <h3>Preferred Days of the Week to Meet (Optional - Select all that apply)</h3>
+                        
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="sunday" name="preferred_days" value="Sunday">
+                            <label for="sunday">Sunday</label>
+                        </div>
+                        
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="monday" name="preferred_days" value="Monday">
+                            <label for="monday">Monday</label>
+                        </div>
+                        
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="tuesday" name="preferred_days" value="Tuesday">
+                            <label for="tuesday">Tuesday</label>
+                        </div>
+                        
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="wednesday" name="preferred_days" value="Wednesday">
+                            <label for="wednesday">Wednesday</label>
+                        </div>
+                        
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="thursday" name="preferred_days" value="Thursday">
+                            <label for="thursday">Thursday</label>
+                        </div>
+                        
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="friday" name="preferred_days" value="Friday">
+                            <label for="friday">Friday</label>
+                        </div>
+                        
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="saturday" name="preferred_days" value="Saturday">
+                            <label for="saturday">Saturday</label>
+                        </div>
                     </div>
                 </div>
                 
@@ -342,6 +396,7 @@
             const lastName = formData.get('last_name');
             const email = formData.get('email');
             const interests = formData.getAll('interests');
+            const preferredDays = formData.getAll('preferred_days');
             
             // Basic validation
             if (!firstName || !lastName || !email) {
@@ -364,12 +419,17 @@
             const interestsString = interests.join(', ');
             document.getElementById('selectedInterests').value = interestsString;
             
+            // Convert preferred days array to comma-separated string for Salesforce
+            const preferredDaysString = preferredDays.join(', ');
+            document.getElementById('selectedDays').value = preferredDaysString;
+            
             // Log form data for debugging (remove in production)
             console.log('Form submitted to Salesforce:', {
                 firstName,
                 lastName,
                 email,
-                interests: interestsString
+                interests: interestsString,
+                preferredDays: preferredDaysString
             });
             
             // Form will now submit to Salesforce automatically
@@ -377,7 +437,7 @@
         });
 
         // Add some interactive feedback
-        const inputs = document.querySelectorAll('input[type="text"], input[type="email"]');
+        const inputs = document.querySelectorAll('input[type="text"], input[type="email"], select');
         inputs.forEach(input => {
             input.addEventListener('focus', function() {
                 this.parentElement.style.transform = 'scale(1.02)';
